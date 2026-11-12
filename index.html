@@ -1,1 +1,369 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>子平八字排盘</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --card: #1a2332;
+    --accent: #c9a86c;
+    --text: #e8e6e3;
+    --muted: #8b9bb4;
+    --border: #2d3a4f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  .container { max-width: 980px; margin: 0 auto; }
+  h1 { text-align: center; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: var(--muted); margin-bottom: 28px; font-size: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #121820;
+    color: var(--text);
+    font-size: 15px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .btn-row { text-align: center; margin-top: 8px; }
+  button {
+    background: var(--accent);
+    color: #1a1408;
+    border: none;
+    padding: 12px 36px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.92; }
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .pillar {
+    background: #121820;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .pillar .title { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .pillar .ganzhi { font-size: 28px; font-weight: 600; color: var(--accent); letter-spacing: 2px; }
+  .pillar .sub { font-size: 12px; color: #aaa; margin-top: 6px; line-height: 1.5; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .info-item { background: #121820; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+  .info-item .label { font-size: 12px; color: var(--muted); }
+  .info-item .value { font-size: 16px; margin-top: 4px; }
+  .dayun { margin-top: 10px; }
+  .dayun-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+  }
+  .dayun-item:last-child { border-bottom: none; }
+  .note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 20px; }
+  .hidden { display: none; }
+  .element-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .el { padding: 4px 10px; border-radius: 6px; font-size: 13px; background: #222; }
+  .el.wood { color: #4ade80; }
+  .el.fire { color: #f87171; }
+  .el.earth { color: #fbbf24; }
+  .el.metal { color: #e5e7eb; }
+  .el.water { color: #60a5fa; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>子平八字排盘</h1>
+  <div class="subtitle">基于节气精确计算 · 仅供学习参考</div>
+
+  <div class="card">
+    <div class="form-grid">
+      <div>
+        <label>出生年</label>
+        <input type="number" id="year" value="1990" min="1900" max="2100">
+      </div>
+      <div>
+        <label>月</label>
+        <input type="number" id="month" value="5" min="1" max="12">
+      </div>
+      <div>
+        <label>日</label>
+        <input type="number" id="day" value="15" min="1" max="31">
+      </div>
+      <div>
+        <label>时（24小时）</label>
+        <input type="number" id="hour" value="14" min="0" max="23">
+      </div>
+      <div>
+        <label>分</label>
+        <input type="number" id="minute" value="30" min="0" max="59">
+      </div>
+      <div>
+        <label>性别</label>
+        <select id="gender">
+          <option value="1">男</option>
+          <option value="0">女</option>
+        </select>
+      </div>
+      <div>
+        <label>子时流派</label>
+        <select id="sect">
+          <option value="2">流派2（23点后日柱仍算当天，常用）</option>
+          <option value="1">流派1（23点后日柱算次日）</option>
+        </select>
+      </div>
+      <div>
+        <label>出生地经度</label>
+        <input type="number" id="longitude" value="116.4" step="0.1" min="70" max="140" placeholder="东经度数">
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:22px;">
+        <input type="checkbox" id="useTrueSolar" checked style="width:auto;">
+        <label for="useTrueSolar" style="margin:0; color:var(--text);">启用真太阳时校正</label>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button onclick="calculate()">开始排盘</button>
+    </div>
+  </div>
+
+  <div id="result" class="hidden">
+    <div class="card">
+      <h3 style="margin-top:0; color:var(--accent);">四柱八字</h3>
+      <div class="pillars" id="pillars"></div>
+      <div class="info-grid" id="basicInfo"></div>
+      <div id="elements"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0; color:var(--accent);">大运</h3>
+      <div id="yunInfo" style="margin-bottom:12px; font-size:14px;"></div>
+      <div class="dayun" id="dayunList"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    算法基于 lunar-javascript 库，年柱以立春为界，月柱以节气为界。<br>
+    结果仅供文化学习与娱乐参考，不构成任何人生决策建议。
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.8/lunar.js"></script>
+<script>
+function calculate() {
+  const year = parseInt(document.getElementById('year').value);
+  const month = parseInt(document.getElementById('month').value);
+  const day = parseInt(document.getElementById('day').value);
+  const hour = parseInt(document.getElementById('hour').value);
+  const minute = parseInt(document.getElementById('minute').value);
+  const gender = parseInt(document.getElementById('gender').value);
+  const sect = parseInt(document.getElementById('sect').value);
+  const longitude = parseFloat(document.getElementById('longitude').value) || 120;
+  const useTrueSolar = document.getElementById('useTrueSolar').checked;
+
+  if (!year || !month || !day || hour < 0 || hour > 23) {
+    alert('请填写完整的出生年月日时');
+    return;
+  }
+
+  try {
+    let calcYear = year, calcMonth = month, calcDay = day, calcHour = hour, calcMinute = minute;
+    let timeInfoHtml = '';
+
+    if (useTrueSolar) {
+      const correction = getTrueSolarCorrection(year, month, day, longitude);
+      const totalOffsetMin = correction.longitudeOffset + correction.eot;
+
+      // 应用偏移
+      const totalMinutes = hour * 60 + minute + totalOffsetMin;
+      const adjusted = adjustDateTime(year, month, day, totalMinutes);
+
+      calcYear = adjusted.year;
+      calcMonth = adjusted.month;
+      calcDay = adjusted.day;
+      calcHour = adjusted.hour;
+      calcMinute = adjusted.minute;
+
+      timeInfoHtml = `
+        <div class="info-item" style="grid-column:1/-1;">
+          <div class="label">真太阳时校正</div>
+          <div class="value" style="font-size:14px; line-height:1.7;">
+            钟表时间：${pad(hour)}:${pad(minute)}<br>
+            经度修正：${formatOffset(correction.longitudeOffset)}（经度 ${longitude}°）<br>
+            均时差：${formatOffset(correction.eot)}<br>
+            总偏移：${formatOffset(totalOffsetMin)}<br>
+            <strong style="color:var(--accent);">真太阳时：${adjusted.year}-${pad(adjusted.month)}-${pad(adjusted.day)} ${pad(adjusted.hour)}:${pad(adjusted.minute)}</strong>
+          </div>
+        </div>
+      `;
+    }
+
+    const solar = Solar.fromYmdHms(calcYear, calcMonth, calcDay, calcHour, calcMinute, 0);
+    const lunar = solar.getLunar();
+    const ec = lunar.getEightChar();
+    ec.setSect(sect);
+
+    // 四柱
+    const pillars = [
+      { name: '年柱', gz: ec.getYear(), gan: ec.getYearGan(), zhi: ec.getYearZhi(),
+        hide: ec.getYearHideGan(), ssGan: ec.getYearShiShenGan(), ssZhi: ec.getYearShiShenZhi(), nayin: ec.getYearNaYin() },
+      { name: '月柱', gz: ec.getMonth(), gan: ec.getMonthGan(), zhi: ec.getMonthZhi(),
+        hide: ec.getMonthHideGan(), ssGan: ec.getMonthShiShenGan(), ssZhi: ec.getMonthShiShenZhi(), nayin: ec.getMonthNaYin() },
+      { name: '日柱', gz: ec.getDay(), gan: ec.getDayGan(), zhi: ec.getDayZhi(),
+        hide: ec.getDayHideGan(), ssGan: '日主', ssZhi: ec.getDayShiShenZhi(), nayin: ec.getDayNaYin() },
+      { name: '时柱', gz: ec.getTime(), gan: ec.getTimeGan(), zhi: ec.getTimeZhi(),
+        hide: ec.getTimeHideGan(), ssGan: ec.getTimeShiShenGan(), ssZhi: ec.getTimeShiShenZhi(), nayin: ec.getTimeNaYin() }
+    ];
+
+    const pillarsHtml = pillars.map(p => `
+      <div class="pillar">
+        <div class="title">${p.name}</div>
+        <div class="ganzhi">${p.gz}</div>
+        <div class="sub">
+          天干十神：${p.ssGan}<br>
+          地支十神：${(p.ssZhi || []).join(' ')}<br>
+          藏干：${(p.hide || []).join(' ')}<br>
+          纳音：${p.nayin}
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('pillars').innerHTML = pillarsHtml;
+
+    // 基本信息
+    const dayMaster = ec.getDayGan();
+    const dayMasterWuxing = getWuxing(dayMaster);
+    document.getElementById('basicInfo').innerHTML = timeInfoHtml + `
+      <div class="info-item"><div class="label">日主</div><div class="value">${dayMaster}（${dayMasterWuxing}）</div></div>
+      <div class="info-item"><div class="label">生肖</div><div class="value">${lunar.getYearShengXiao()}</div></div>
+      <div class="info-item"><div class="label">农历</div><div class="value">${lunar.toString()}</div></div>
+      <div class="info-item"><div class="label">胎元</div><div class="value">${ec.getTaiYuan()}</div></div>
+      <div class="info-item"><div class="label">命宫</div><div class="value">${ec.getMingGong()}</div></div>
+      <div class="info-item"><div class="label">身宫</div><div class="value">${ec.getShenGong()}</div></div>
+    `;
+
+    // 五行统计（简化版，仅天干+藏干）
+    const elements = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
+    const allGan = [ec.getYearGan(), ec.getMonthGan(), ec.getDayGan(), ec.getTimeGan()];
+    allGan.forEach(g => { const w = getWuxing(g); if (w) elements[w]++; });
+    pillars.forEach(p => (p.hide || []).forEach(h => { const w = getWuxing(h); if (w) elements[w]++; }));
+
+    let elHtml = '<div style="margin-top:16px;"><strong>五行力量（天干+藏干）：</strong><div class="element-bar">';
+    elHtml += `<span class="el wood">木 ${elements['木']}</span>`;
+    elHtml += `<span class="el fire">火 ${elements['火']}</span>`;
+    elHtml += `<span class="el earth">土 ${elements['土']}</span>`;
+    elHtml += `<span class="el metal">金 ${elements['金']}</span>`;
+    elHtml += `<span class="el water">水 ${elements['水']}</span>`;
+    elHtml += '</div></div>';
+    document.getElementById('elements').innerHTML = elHtml;
+
+    // 大运
+    const yun = ec.getYun(gender, sect);
+    const startYear = yun.getStartYear();
+    const startMonth = yun.getStartMonth();
+    const startDay = yun.getStartDay();
+    const isForward = yun.isForward();
+    document.getElementById('yunInfo').innerHTML = 
+      `起运：出生后 ${startYear} 年 ${startMonth} 月 ${startDay} 天起运（${isForward ? '顺排' : '逆排'}）`;
+
+    const daYunList = yun.getDaYun(10);
+    let dyHtml = '';
+    daYunList.forEach((dy, i) => {
+      if (i === 0 && dy.getGanZhi() === '') return; // 跳过起运前
+      dyHtml += `<div class="dayun-item">
+        <span>${dy.getStartAge()} - ${dy.getEndAge()} 岁</span>
+        <span style="color:var(--accent); font-weight:600;">${dy.getGanZhi()}</span>
+        <span>${dy.getStartYear()} 年起</span>
+      </div>`;
+    });
+    document.getElementById('dayunList').innerHTML = dyHtml || '<div>暂无大运数据</div>';
+
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    console.error(err);
+    alert('计算出错，请检查输入的日期是否有效。\n' + err.message);
+  }
+}
+
+function pad(n) {
+  return n.toString().padStart(2, '0');
+}
+
+function formatOffset(min) {
+  const sign = min >= 0 ? '+' : '-';
+  const abs = Math.abs(Math.round(min));
+  return sign + abs + ' 分钟';
+}
+
+function getTrueSolarCorrection(year, month, day, longitude) {
+  // 经度修正：(当地经度 - 120) * 4 分钟
+  const longitudeOffset = (longitude - 120) * 4;
+
+  // 均时差（Equation of Time）近似公式（NOAA）
+  const n = Math.floor(275 * month / 9) - Math.floor((month + 9) / 12) * (1 + Math.floor((year % 4) / 3)) + day - 30;
+  const B = (n - 81) * 360 / 365 * Math.PI / 180;
+  const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+
+  return { longitudeOffset, eot };
+}
+
+function adjustDateTime(year, month, day, totalMinutes) {
+  const base = new Date(year, month - 1, day, 0, 0, 0);
+  base.setMinutes(base.getMinutes() + Math.round(totalMinutes));
+  return {
+    year: base.getFullYear(),
+    month: base.getMonth() + 1,
+    day: base.getDate(),
+    hour: base.getHours(),
+    minute: base.getMinutes()
+  };
+}
+
+function getWuxing(gan) {
+  const map = {
+    '甲': '木', '乙': '木',
+    '丙': '火', '丁': '火',
+    '戊': '土', '己': '土',
+    '庚': '金', '辛': '金',
+    '壬': '水', '癸': '水'
+  };
+  return map[gan] || '';
+}
+</script>
+</body>
+</html>
